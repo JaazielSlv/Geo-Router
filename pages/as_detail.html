@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do AS - GeoRoute BR</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://unpkg.com/d3@7"></script>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-light bg-primary shadow-sm">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+          <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='currentColor' class='bi bi-list' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z'/></svg>
+        </button>
+        <span class="navbar-brand mb-0 h1 text-white">GeoRoute BR</span>
+      </div>
+    </nav>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a class="nav-link" href="../index.html">Home</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="map.html">Mapa</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="search.html">Busca</a></li>
+          <li class="nav-item mb-2"><a class="nav-link active text-primary fw-bold" href="as_detail.html">Detalhe AS</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="about.html">Sobre</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="contact.html">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-5">
+    <h2 id="asnTitle" class="display-5 mb-4">Detalhes do Sistema Autônomo</h2>
+
+    <!-- Informações Básicas -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">Informações Básicas</h5>
+      </div>
+      <div class="card-body" id="info">
+        <!-- Populado por script -->
+      </div>
+    </div>
+
+    <!-- Prefixos Anunciados -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Prefixos Anunciados</h5>
+      </div>
+      <div class="card-body">
+        <div id="prefixes" class="row g-2">
+          <!-- Populado por script -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Conexões de Rede -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Upstream Providers</h5>
+          </div>
+          <div class="card-body" id="upstreams">
+            <!-- Populado por script -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Peers</h5>
+          </div>
+          <div class="card-body" id="peers">
+            <!-- Populado por script -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Histórico de Rotas -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Histórico de Rotas Recente</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped" id="routeHistory">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Prefixo</th>
+                <th>Ação</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Populado por script -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráfico Local -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Topologia Local</h5>
+      </div>
+      <div class="card-body">
+        <div id="localGraph" class="border rounded" style="width:100%;height:400px;"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-light border-top mt-auto py-3">
+    <div class="container text-center text-muted small">
+      &copy; 2026 GeoRoute BR. Todos os direitos reservados.
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    // Função para obter parâmetro da URL
+    function getUrlParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // Dados dummy expandidos
+    const dummyData = {
+      'AS1': {
+        asn: 'AS1',
+        org: 'Example ISP Brasil',
+        country: 'BR',
+        description: 'Provedor de Internet brasileiro com foco em conectividade nacional',
+        prefixes: [
+          '2001:db8::/32',
+          '192.0.2.0/24',
+          '203.0.113.0/24',
+          '198.51.100.0/24'
+        ],
+        upstreams: [
+          {asn: 'AS2', org: 'Global Telecom'},
+          {asn: 'AS4', org: 'International Net'}
+        ],
+        peers: [
+          {asn: 'AS3', org: 'Latin America ISP'},
+          {asn: 'AS5', org: 'South America Net'}
+        ],
+        routes: 42,
+        lastUpdate: '2026-03-21 14:30:00',
+        status: 'Ativo',
+        routeHistory: [
+          {timestamp: '2026-03-21 14:30:00', prefix: '2001:db8::/32', action: 'Anúncio', status: 'Sucesso'},
+          {timestamp: '2026-03-21 13:45:00', prefix: '192.0.2.0/24', action: 'Atualização', status: 'Sucesso'},
+          {timestamp: '2026-03-21 12:15:00', prefix: '203.0.113.0/24', action: 'Anúncio', status: 'Sucesso'},
+          {timestamp: '2026-03-21 11:20:00', prefix: '198.51.100.0/24', action: 'Retirada', status: 'Sucesso'}
+        ],
+        links: [
+          {source: 'AS1', target: 'AS2'},
+          {source: 'AS1', target: 'AS3'},
+          {source: 'AS1', target: 'AS4'},
+          {source: 'AS1', target: 'AS5'}
+        ]
+      },
+      'AS2': {
+        asn: 'AS2',
+        org: 'Global Telecom',
+        country: 'US',
+        description: 'Provedor global de telecomunicações',
+        prefixes: ['10.0.0.0/8', '172.16.0.0/12'],
+        upstreams: [{asn: 'AS6', org: 'Tier 1 Provider'}],
+        peers: [{asn: 'AS1', org: 'Example ISP Brasil'}, {asn: 'AS7', org: 'European Net'}],
+        routes: 156,
+        lastUpdate: '2026-03-21 14:25:00',
+        status: 'Ativo',
+        routeHistory: [
+          {timestamp: '2026-03-21 14:25:00', prefix: '10.0.0.0/8', action: 'Anúncio', status: 'Sucesso'}
+        ],
+        links: [
+          {source: 'AS2', target: 'AS1'},
+          {source: 'AS2', target: 'AS6'},
+          {source: 'AS2', target: 'AS7'}
+        ]
+      }
+    };
+
+    // Carregar dados da página
+    document.addEventListener('DOMContentLoaded', function() {
+      const asn = getUrlParameter('asn') || 'AS1';
+      const data = dummyData[asn];
+
+      if (data) {
+        // Atualizar título
+        document.getElementById('asnTitle').textContent = `${data.asn} - ${data.org}`;
+
+        // Informações básicas
+        const infoDiv = document.getElementById('info');
+        infoDiv.innerHTML = `
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>ASN:</strong> ${data.asn}</p>
+              <p><strong>Organização:</strong> ${data.org}</p>
+              <p><strong>País:</strong> ${data.country}</p>
+              <p><strong>Status:</strong> <span class="badge bg-success">${data.status}</span></p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Descrição:</strong> ${data.description}</p>
+              <p><strong>Número de rotas:</strong> ${data.routes}</p>
+              <p><strong>Última atualização:</strong> ${data.lastUpdate}</p>
+            </div>
+          </div>
+        `;
+
+        // Prefixos
+        const prefixesDiv = document.getElementById('prefixes');
+        prefixesDiv.innerHTML = data.prefixes.map(prefix => `
+          <div class="col-md-6 col-lg-3">
+            <div class="p-2 border rounded bg-light text-center">
+              <code>${prefix}</code>
+            </div>
+          </div>
+        `).join('');
+
+        // Upstreams
+        const upstreamsDiv = document.getElementById('upstreams');
+        upstreamsDiv.innerHTML = data.upstreams.map(upstream => `
+          <div class="mb-2">
+            <a href="as_detail.html?asn=${upstream.asn}" class="text-decoration-none">
+              <div class="d-flex align-items-center p-2 border rounded hover-bg-light">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-diagram-3 me-2 text-primary" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1.5H10a.5.5 0 0 1 0 1h-1.5V10a.5.5 0 0 1-1 0V8.5H6a.5.5 0 0 1 0-1h1.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                  <path d="M9 5.5a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1h-1.5a.5.5 0 0 1-.5-.5z"/>
+                  <path d="M6.5 8a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V9a.5.5 0 0 0-.5-.5z"/>
+                </svg>
+                <div>
+                  <strong>${upstream.asn}</strong><br>
+                  <small class="text-muted">${upstream.org}</small>
+                </div>
+              </div>
+            </a>
+          </div>
+        `).join('');
+
+        // Peers
+        const peersDiv = document.getElementById('peers');
+        peersDiv.innerHTML = data.peers.map(peer => `
+          <div class="mb-2">
+            <a href="as_detail.html?asn=${peer.asn}" class="text-decoration-none">
+              <div class="d-flex align-items-center p-2 border rounded hover-bg-light">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-share me-2 text-success" viewBox="0 0 16 16">
+                  <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                </svg>
+                <div>
+                  <strong>${peer.asn}</strong><br>
+                  <small class="text-muted">${peer.org}</small>
+                </div>
+              </div>
+            </a>
+          </div>
+        `).join('');
+
+        // Histórico de rotas
+        const historyTable = document.querySelector('#routeHistory tbody');
+        historyTable.innerHTML = data.routeHistory.map(entry => `
+          <tr>
+            <td>${entry.timestamp}</td>
+            <td><code>${entry.prefix}</code></td>
+            <td>${entry.action}</td>
+            <td><span class="badge bg-${entry.status === 'Sucesso' ? 'success' : 'warning'}">${entry.status}</span></td>
+          </tr>
+        `).join('');
+
+        // Desenhar gráfico local
+        drawLocalGraph(data);
+      } else {
+        // ASN não encontrado
+        document.getElementById('asnTitle').textContent = 'ASN não encontrado';
+        document.getElementById('info').innerHTML = `
+          <div class="alert alert-warning">
+            <h4 class="alert-heading">ASN não encontrado</h4>
+            <p>O Sistema Autônomo solicitado não foi encontrado em nossa base de dados.</p>
+            <hr>
+            <p class="mb-0">Tente buscar por outro ASN na página de <a href="search.html">busca</a>.</p>
+          </div>
+        `;
+      }
+    });
+
+    // Função para desenhar o gráfico local
+    function drawLocalGraph(data) {
+      const width = document.getElementById('localGraph').clientWidth;
+      const height = 400;
+
+      // Preparar nós e links
+      const nodes = [{id: data.asn, group: 1}];
+      const links = [];
+
+      // Adicionar upstreams
+      data.upstreams.forEach(up => {
+        if (!nodes.find(n => n.id === up.asn)) {
+          nodes.push({id: up.asn, group: 2});
+        }
+        links.push({source: data.asn, target: up.asn, type: 'upstream'});
+      });
+
+      // Adicionar peers
+      data.peers.forEach(peer => {
+        if (!nodes.find(n => n.id === peer.asn)) {
+          nodes.push({id: peer.asn, group: 3});
+        }
+        links.push({source: data.asn, target: peer.asn, type: 'peer'});
+      });
+
+      const svg = d3.select('#localGraph').append('svg')
+          .attr('width', width)
+          .attr('height', height);
+
+      const simulation = d3.forceSimulation(nodes)
+          .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+          .force('charge', d3.forceManyBody().strength(-300))
+          .force('center', d3.forceCenter(width / 2, height / 2));
+
+      const link = svg.append('g')
+          .attr('stroke', '#999')
+          .attr('stroke-opacity', 0.6)
+        .selectAll('line')
+        .data(links)
+        .join('line')
+          .attr('stroke-width', d => d.type === 'upstream' ? 3 : 2)
+          .attr('stroke', d => d.type === 'upstream' ? '#0d6efd' : '#198754');
+
+      const node = svg.append('g')
+          .attr('stroke', '#fff')
+          .attr('stroke-width', 1.5)
+        .selectAll('circle')
+        .data(nodes)
+        .join('circle')
+          .attr('r', d => d.group === 1 ? 25 : 20)
+          .attr('fill', d => {
+            if (d.group === 1) return '#0d6efd'; // ASN principal
+            if (d.group === 2) return '#6c757d'; // Upstreams
+            return '#198754'; // Peers
+          });
+
+      node.append('title')
+          .text(d => d.id);
+
+      // Adicionar labels
+      const text = svg.append('g')
+          .attr('font-family', 'sans-serif')
+          .attr('font-size', 12)
+        .selectAll('text')
+        .data(nodes)
+        .join('text')
+          .attr('x', 0)
+          .attr('y', 0)
+          .attr('dy', '0.35em')
+          .attr('text-anchor', 'middle')
+          .attr('fill', 'white')
+          .attr('font-weight', 'bold')
+          .text(d => d.id);
+
+      simulation.on('tick', () => {
+        link
+            .attr('x1', d => d.source.x)
+            .attr('y1', d => d.source.y)
+            .attr('x2', d => d.target.x)
+            .attr('y2', d => d.target.y);
+
+        node
+            .attr('cx', d => d.x)
+            .attr('cy', d => d.y);
+
+        text
+            .attr('x', d => d.x)
+            .attr('y', d => d.y);
+      });
+    }
+  </script>
+</body>
+</html>
+  const nodes = [{id:data.asn},{id:data.upstreams[0]},{id:data.peers[0]}];
+  const links = data.links;
+  const w = document.getElementById('localGraph').clientWidth;
+  const h = document.getElementById('localGraph').clientHeight;
+  const svg = d3.select('#localGraph').append('svg').attr('width',w).attr('height',h);
+  const sim = d3.forceSimulation(nodes).force('link',d3.forceLink(links).id(d=>d.id).distance(100)).force('charge',d3.forceManyBody().strength(-200)).force('center',d3.forceCenter(w/2,h/2));
+  const link = svg.append('g').attr('stroke','#aaa').selectAll('line').data(links).join('line');
+  const node = svg.append('g').attr('stroke','#fff').attr('stroke-width',1.5).selectAll('circle').data(nodes).join('circle').attr('r',10).attr('fill','#3182ce');
+  sim.on('tick',()=>{link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);node.attr('cx',d=>d.x).attr('cy',d=>d.y);});
+}
+</script>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

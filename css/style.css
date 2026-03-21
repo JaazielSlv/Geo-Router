@@ -1,0 +1,67 @@
+/* Arquivo principal de estilos customizados do projeto. Adicione aqui regras específicas além do Bootstrap. */
+
+/* Estilos para a página de detalhes do AS */
+.hover-bg-light:hover {
+  background-color: #f8f9fa !important;
+  transition: background-color 0.2s ease;
+}
+
+.asn-link {
+  transition: all 0.2s ease;
+}
+
+.asn-link:hover {
+  transform: translateX(5px);
+  text-decoration: none !important;
+}
+
+/* Melhorar aparência das tabelas */
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Estilos para o gráfico D3 */
+.node circle {
+  cursor: pointer;
+  transition: r 0.2s ease;
+}
+
+.node circle:hover {
+  r: 30px;
+}
+
+.link {
+  stroke-opacity: 0.6;
+  stroke-width: 2px;
+}
+
+/* Responsividade para o gráfico */
+#localGraph svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Cards com hover effect */
+.card {
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Badges customizados */
+.badge {
+  font-size: 0.75em;
+}
+
+/* Prefixos em destaque */
+code {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}

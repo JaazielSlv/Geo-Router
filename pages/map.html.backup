@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa Interativo GeoRoute BR</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-light bg-primary shadow-sm">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+          <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='currentColor' class='bi bi-list' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z'/></svg>
+        </button>
+        <span class="navbar-brand mb-0 h1 text-white">GeoRoute BR</span>
+      </div>
+    </nav>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a class="nav-link" href="../index.html">Home</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item mb-2"><a class="nav-link active text-primary fw-bold" href="map.html">Mapa</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="search.html">Busca</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="as_detail.html">Detalhe AS</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="about.html">Sobre</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="contact.html">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-fluid py-3">
+    <h2 class="display-5 mb-4">Mapa Interativo de Topologia BGP</h2>
+
+    <!-- Controles do Mapa -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <input id="searchInput" type="text" class="form-control" placeholder="Buscar ASN ou organização..." />
+      </div>
+      <div class="col-md-2">
+        <select id="regionFilter" class="form-select">
+          <option value="">Todas as regiões</option>
+          <option value="BR">Brasil</option>
+          <option value="US">Estados Unidos</option>
+          <option value="EU">Europa</option>
+          <option value="AS">Ásia</option>
+          <option value="SA">América do Sul</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select id="connectionFilter" class="form-select">
+          <option value="">Todos os tipos</option>
+          <option value="upstream">Upstreams</option>
+          <option value="peer">Peers</option>
+          <option value="customer">Customers</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <div class="d-flex gap-2">
+          <button id="resetViewBtn" class="btn btn-outline-secondary">Reset View</button>
+          <button id="toggleConnectionsBtn" class="btn btn-outline-primary">Ocultar Conexões</button>
+          <button id="showLegendBtn" class="btn btn-outline-info">Legenda</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container do Mapa -->
+    <div class="row">
+      <div class="col-12">
+        <div id="map" style="height: 600px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"></div>
+      </div>
+    </div>
+
+    <!-- Legenda (oculta por padrão) -->
+    <div id="legend" class="card mt-3" style="display: none;">
+      <div class="card-body">
+        <h6 class="card-title">Legenda</h6>
+        <div class="row">
+          <div class="col-md-4">
+            <h6>Tipos de AS:</h6>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-primary rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+              <span>Transit Provider</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+              <span>Content Provider</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-warning rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+              <span>Enterprise</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h6>Conexões:</h6>
+            <div class="d-flex align-items-center mb-2">
+              <div style="width: 20px; height: 2px; background: #007bff; margin-right: 8px;"></div>
+              <span>Upstream</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div style="width: 20px; height: 2px; background: #28a745; margin-right: 8px;"></div>
+              <span>Peer</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div style="width: 20px; height: 2px; background: #ffc107; margin-right: 8px;"></div>
+              <span>Downstream</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h6>Status:</h6>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-danger rounded-circle me-2" style="width: 12px; height: 12px; opacity: 0.7;"></div>
+              <span>Alerta Ativo</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-info rounded-circle me-2" style="width: 12px; height: 12px; opacity: 0.7;"></div>
+              <span>Rota Instável</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-light border-top mt-auto py-3">
+    <div class="container text-center text-muted small">
+      &copy; 2026 GeoRoute BR. Todos os direitos reservados.
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="../js/bgp-api.js"></script>
+  <script>
+    // AS brasileiros iniciais para carregar
+    const initialAsns = [28513, 27699, 4230, 1916, 53006, 262287, 28186, 14840, 263432, 265680, 61678, 52532, 271180, 267613, 268580];
+    let asData = [];
+    let loadedAsns = new Set();
+
+    // Carregar dados iniciais
+    async function loadInitialData() {
+      showLoadingStatus('Carregando dados dos AS brasileiros...');
+      
+      const promises = initialAsns.map(asn => loadAsData(asn));
+      const results = await Promise.all(promises);
+      
+      asData = results.filter(data => data !== null);
+      loadedAsns = new Set(asData.map(as => as.asn));
+      
+      // Inicializar mapa com dados carregados
+      initializeMap();
+      hideLoadingStatus();
+    }
+
+    // Inicializar mapa
+    function initializeMap() {
+      const map = L.map('map').setView([-15, -55], 4); // Centro no Brasil
+
+      // Adicionar tile layer do OpenStreetMap
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18,
+      }).addTo(map);
+
+      // Grupos de camadas
+      const asMarkers = L.layerGroup().addTo(map);
+      const connectionLines = L.layerGroup().addTo(map);
+
+      // Adicionar todos os AS ao mapa
+      asData.forEach(as => {
+        const marker = createAsMarker(as);
+        asMarkers.addLayer(marker);
+      });
+
+      // Desenhar conexões
+      drawConnections();
+
+      // Configurar event listeners
+      setupEventListeners(map, asMarkers, connectionLines);
+    }
+
+    // Adicionar tile layer do OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 18,
+    }).addTo(map);
+
+    // Grupos de camadas
+    const asMarkers = L.layerGroup().addTo(map);
+    const connectionLines = L.layerGroup().addTo(map);
+
+    // Função para obter cor baseada no tipo de AS
+    function getAsColor(type) {
+      switch(type) {
+        case 'transit': return '#007bff';
+        case 'content': return '#28a745';
+        case 'enterprise': return '#ffc107';
+        default: return '#6c757d';
+      }
+    }
+
+    // Função para criar marcador de AS
+    function createAsMarker(as) {
+      const color = getAsColor(as.type);
+      const marker = L.circleMarker([as.lat, as.lng], {
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.8,
+        radius: 8,
+        weight: 2
+      });
+
+      marker.bindPopup(`
+        <div class="text-center">
+          <h6>AS${as.asn}</h6>
+          <p class="mb-1">${as.name}</p>
+          <p class="mb-2"><small class="text-muted">${as.type.toUpperCase()}</small></p>
+          <a href="as_detail.html?asn=${as.asn}" class="btn btn-sm btn-primary">Ver Detalhes</a>
+        </div>
+      `);
+
+      marker.on('click', function() {
+        // Destacar conexões quando clicar no AS
+        highlightConnections(as.asn);
+      });
+
+      return marker;
+    }
+
+    // Função para desenhar conexões
+    function drawConnections() {
+      connectionLines.clearLayers();
+
+      asData.forEach(as => {
+        const fromLatLng = [as.lat, as.lng];
+
+        as.connections.forEach(connection => {
+          const connectedAs = asData.find(a => a.asn === connection.asn);
+          if (connectedAs) {
+            const toLatLng = [connectedAs.lat, connectedAs.lng];
+            let color;
+            switch(connection.type) {
+              case 'upstream': color = '#007bff'; break;
+              case 'peer': color = '#28a745'; break;
+              case 'downstream': color = '#ffc107'; break;
+              default: color = '#6c757d';
+            }
+
+            L.polyline([fromLatLng, toLatLng], {
+              color: color,
+              weight: 1,
+              opacity: 0.6,
+              dashArray: connection.type === 'peer' ? null : '5, 5'
+            }).addTo(connectionLines);
+          }
+        });
+      });
+    }
+
+    // Função para destacar conexões de um AS específico
+    function highlightConnections(asn) {
+      connectionLines.clearLayers();
+
+      const selectedAs = asData.find(a => a.asn === asn);
+      if (!selectedAs) return;
+
+      selectedAs.connections.forEach(connection => {
+        const connectedAs = asData.find(a => a.asn === connection.asn);
+        if (connectedAs) {
+          const fromLatLng = [selectedAs.lat, selectedAs.lng];
+          const toLatLng = [connectedAs.lat, connectedAs.lng];
+
+          let color;
+          switch(connection.type) {
+            case 'upstream': color = '#007bff'; break;
+            case 'peer': color = '#28a745'; break;
+            case 'downstream': color = '#dc3545'; break; // Vermelho para destacar
+            default: color = '#ff0000';
+          }
+
+          L.polyline([fromLatLng, toLatLng], {
+            color: color,
+            weight: 3,
+            opacity: 1
+          }).addTo(connectionLines);
+        }
+      });
+    }
+
+    // Função para filtrar AS baseado na busca
+    async function filterAs(searchTerm, asMarkers, map) {
+      asMarkers.clearLayers();
+
+      let filteredAs = asData.filter(as =>
+        as.asn.toString().includes(searchTerm) ||
+        as.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      // Se não encontrou e parece ser um ASN, tentar carregar dinamicamente
+      if (filteredAs.length === 0 && /^\d+$/.test(searchTerm)) {
+        const asn = parseInt(searchTerm);
+        if (!loadedAsns.has(asn)) {
+          try {
+            const newAsData = await loadAsData(asn);
+            if (newAsData) {
+              asData.push(newAsData);
+              loadedAsns.add(asn);
+              filteredAs = [newAsData];
+              
+              // Recarregar marcadores e conexões
+              asData.forEach(as => {
+                const marker = createAsMarker(as);
+                asMarkers.addLayer(marker);
+              });
+              drawConnections();
+            }
+          } catch (error) {
+            console.error('Erro ao carregar AS:', error);
+          }
+        }
+      }
+
+      // Mostrar apenas os filtrados
+      asMarkers.clearLayers();
+      filteredAs.forEach(as => {
+        const marker = createAsMarker(as);
+        asMarkers.addLayer(marker);
+      });
+
+      if (filteredAs.length > 0) {
+        const bounds = L.latLngBounds(filteredAs.map(as => [as.lat, as.lng]));
+        map.fitBounds(bounds, { padding: [20, 20] });
+      }
+    }
+
+    // Função para filtrar por região
+    function filterByRegion(region, asMarkers) {
+      asMarkers.clearLayers();
+
+      const filteredAs = region ? asData.filter(as => as.region === region) : asData;
+
+      filteredAs.forEach(as => {
+        const marker = createAsMarker(as);
+        asMarkers.addLayer(marker);
+      });
+    }
+
+    // Configurar event listeners
+    function setupEventListeners(map, asMarkers, connectionLines) {
+      document.getElementById('searchInput').addEventListener('input', async function(e) {
+        const searchTerm = e.target.value.trim();
+        if (searchTerm.length > 0) {
+          await filterAs(searchTerm, asMarkers, map);
+        } else {
+          // Reset para mostrar todos
+          asMarkers.clearLayers();
+          asData.forEach(as => {
+            const marker = createAsMarker(as);
+            asMarkers.addLayer(marker);
+          });
+          map.setView([-15, -55], 4);
+        }
+      });
+
+      document.getElementById('regionFilter').addEventListener('change', function(e) {
+        filterByRegion(e.target.value, asMarkers);
+      });
+
+      document.getElementById('resetViewBtn').addEventListener('click', function() {
+        map.setView([-15, -55], 4);
+      });
+
+      document.getElementById('toggleConnectionsBtn').addEventListener('click', function() {
+        if (map.hasLayer(connectionLines)) {
+          map.removeLayer(connectionLines);
+          this.textContent = 'Mostrar Conexões';
+        } else {
+          map.addLayer(connectionLines);
+          this.textContent = 'Ocultar Conexões';
+        }
+      });
+
+      document.getElementById('showLegendBtn').addEventListener('click', function() {
+        const legend = document.getElementById('legend');
+        legend.style.display = legend.style.display === 'none' ? 'block' : 'none';
+      });
+
+      // Adicionar controle de camadas
+      const baseLayers = {
+        "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        })
+      };
+
+      const overlays = {
+        "AS Nodes": asMarkers,
+        "Connections": connectionLines
+      };
+
+      L.control.layers(baseLayers, overlays).addTo(map);
+    }
+
+    // Inicializar quando DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', loadInitialData);
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

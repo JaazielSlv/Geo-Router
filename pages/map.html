@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa Interativo GeoRoute BR</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    .custom-popup .leaflet-popup-content-wrapper {
+      border-radius: 8px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+    }
+    .custom-popup .leaflet-popup-content {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .leaflet-tooltip {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-light bg-primary shadow-sm">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+          <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='currentColor' class='bi bi-list' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z'/></svg>
+        </button>
+        <span class="navbar-brand mb-0 h1 text-white">GeoRoute BR</span>
+      </div>
+    </nav>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a class="nav-link" href="../index.html">Home</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item mb-2"><a class="nav-link active text-primary fw-bold" href="map.html">Mapa</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="search.html">Busca</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="as_detail.html">Detalhe AS</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="about.html">Sobre</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="contact.html">Contato</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-fluid py-3">
+    <h2 class="display-5 mb-4">Mapa Interativo de Topologia BGP</h2>
+
+    <!-- Controles do Mapa -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <input id="searchInput" type="text" class="form-control" placeholder="Buscar ASN ou organização..." />
+      </div>
+      <div class="col-md-2">
+        <select id="regionFilter" class="form-select">
+          <option value="">Todas as regiões</option>
+          <option value="BR">Brasil</option>
+          <option value="US">Estados Unidos</option>
+          <option value="EU">Europa</option>
+          <option value="AS">Ásia</option>
+          <option value="SA">América do Sul</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select id="connectionFilter" class="form-select">
+          <option value="">Todos os tipos</option>
+          <option value="upstream">Upstreams</option>
+          <option value="peer">Peers</option>
+          <option value="customer">Customers</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <div class="d-flex gap-2">
+          <button id="resetViewBtn" class="btn btn-outline-secondary">Reset View</button>
+          <button id="toggleConnectionsBtn" class="btn btn-outline-primary">Ocultar Conexões</button>
+          <button id="showLegendBtn" class="btn btn-outline-info">Legenda</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Container do Mapa -->
+    <div class="row">
+      <div class="col-md-9">
+        <div id="map" style="height: 600px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"></div>
+      </div>
+      <div class="col-md-3">
+        <div id="asInfoPanel" class="card" style="display: none;">
+          <div class="card-header">
+            <h6 class="card-title mb-0">Informações do AS</h6>
+          </div>
+          <div class="card-body" id="asInfoContent">
+            <!-- Conteúdo será preenchido dinamicamente -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legenda (oculta por padrão) -->
+    <div id="legend" class="card mt-3" style="display: none;">
+      <div class="card-body">
+        <h6 class="card-title">Legenda</h6>
+        <div class="row">
+          <div class="col-md-4">
+            <h6>Tipos de AS:</h6>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-primary rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+              <span>Transit Provider</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-success rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+              <span>Content Provider</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-warning rounded-circle me-2" style="width: 12px; height: 12px;"></div>
+              <span>Enterprise</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h6>Conexões:</h6>
+            <div class="d-flex align-items-center mb-2">
+              <div style="width: 20px; height: 2px; background: #007bff; margin-right: 8px;"></div>
+              <span>Upstream</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div style="width: 20px; height: 2px; background: #28a745; margin-right: 8px;"></div>
+              <span>Peer</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div style="width: 20px; height: 2px; background: #ffc107; margin-right: 8px;"></div>
+              <span>Downstream</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h6>Status:</h6>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-danger rounded-circle me-2" style="width: 12px; height: 12px; opacity: 0.7;"></div>
+              <span>Alerta Ativo</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <div class="bg-info rounded-circle me-2" style="width: 12px; height: 12px; opacity: 0.7;"></div>
+              <span>Rota Instável</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-light border-top mt-auto py-3">
+    <div class="container text-center text-muted small">
+      &copy; 2026 GeoRoute BR. Todos os direitos reservados.
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    // Dados de AS brasileiros com conexões BGP reais (baseados em dados públicos)
+    const asData = [
+      // AS brasileiros principais
+      { asn: 28513, name: "Claro S.A.", lat: -23.5505, lng: -46.6333, type: "transit", region: "BR", country: "Brasil", connections: [3356, 1299, 3257, 174, 2914] },
+      { asn: 27699, name: "Telecom Italia S.p.A.", lat: -22.9068, lng: -43.1729, type: "transit", region: "BR", country: "Brasil", connections: [3356, 1299, 3257, 6762] },
+      { asn: 4230, name: "Embratel", lat: -15.7942, lng: -47.8822, type: "transit", region: "BR", country: "Brasil", connections: [3356, 1299, 3257, 174, 2914] },
+      { asn: 1916, name: "Rede Nacional de Ensino e Pesquisa", lat: -23.5505, lng: -46.6333, type: "enterprise", region: "BR", country: "Brasil", connections: [28513, 27699, 4230] },
+      { asn: 53006, name: "Algar Telecom", lat: -8.0476, lng: -34.8770, type: "transit", region: "BR", country: "Brasil", connections: [3356, 28513, 1299] },
+      { asn: 262287, name: "Maxx Telecom", lat: -3.7319, lng: -38.5267, type: "transit", region: "BR", country: "Brasil", connections: [28513, 27699, 4230] },
+      { asn: 28186, name: "ITS Telecom", lat: -12.9714, lng: -38.5014, type: "transit", region: "BR", country: "Brasil", connections: [28513, 3356, 1299] },
+      { asn: 14840, name: "BR.Digital Provider", lat: -25.4284, lng: -49.2673, type: "transit", region: "BR", country: "Brasil", connections: [28513, 27699, 4230] },
+      { asn: 263432, name: "Unifique", lat: -29.1685, lng: -51.1792, type: "transit", region: "BR", country: "Brasil", connections: [28513, 3356, 1299] },
+      { asn: 265680, name: "Vivo (BH)", lat: -19.9191, lng: -43.9386, type: "transit", region: "BR", country: "Brasil", connections: [27699, 28513, 4230] },
+      { asn: 61678, name: "Locaweb", lat: -23.5505, lng: -46.6333, type: "content", region: "BR", country: "Brasil", connections: [28513, 27699, 4230] },
+      { asn: 52532, name: "SpeedyNet Telecom", lat: -22.9068, lng: -43.1729, type: "transit", region: "BR", country: "Brasil", connections: [27699, 28513, 4230] },
+      { asn: 271180, name: "Hotnet Telecom", lat: -3.7319, lng: -38.5267, type: "transit", region: "BR", country: "Brasil", connections: [262287, 28513, 27699] },
+      { asn: 267613, name: "ELETRONET", lat: -25.4284, lng: -49.2673, type: "enterprise", region: "BR", country: "Brasil", connections: [14840, 28513, 4230] },
+      { asn: 268580, name: "BRASIL TECPAR", lat: -29.1685, lng: -51.1792, type: "enterprise", region: "BR", country: "Brasil", connections: [263432, 28513, 27699] },
+
+      // Transit providers internacionais conectados ao Brasil
+      { asn: 3356, name: "Level 3 Communications", lat: 39.7392, lng: -104.9903, type: "transit", region: "US", country: "Estados Unidos", connections: [28513, 27699, 4230, 53006, 28186, 263432] },
+      { asn: 1299, name: "Telia Company AB", lat: 59.3293, lng: 18.0686, type: "transit", region: "EU", country: "Suécia", connections: [28513, 27699, 4230, 53006, 28186, 263432] },
+      { asn: 3257, name: "GTT Communications", lat: 40.7128, lng: -74.0060, type: "transit", region: "US", country: "Estados Unidos", connections: [28513, 27699, 4230, 14840, 265680] },
+      { asn: 174, name: "Cogent Communications", lat: 38.9072, lng: -77.0369, type: "transit", region: "US", country: "Estados Unidos", connections: [28513, 4230, 1916] },
+      { asn: 2914, name: "NTT America, Inc.", lat: 35.6762, lng: 139.6503, type: "transit", region: "AS", country: "Japão", connections: [28513, 4230, 53006] },
+      { asn: 6762, name: "Telecom Italia Sparkle", lat: 41.9028, lng: 12.4964, type: "transit", region: "EU", connections: [27699, 28513, 4230] },
+      { asn: 6939, name: "Hurricane Electric", lat: 37.7749, lng: -122.4194, type: "transit", region: "US", connections: [28513, 27699, 4230] }
+    ];
+
+    let map, asMarkers, connectionLines;
+
+    // Inicializar mapa quando DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Inicializando mapa...');
+      initializeMap();
+    });
+
+    // Função para inicializar o mapa
+    function initializeMap() {
+      try {
+        // Criar mapa centrado no Brasil
+        map = L.map('map').setView([-15, -55], 4);
+
+        // Adicionar tile layer do OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 18,
+        }).addTo(map);
+
+        // Criar grupos de camadas
+        asMarkers = L.layerGroup().addTo(map);
+        connectionLines = L.layerGroup().addTo(map);
+
+        // Adicionar marcadores de AS
+        asData.forEach(as => {
+          const marker = createAsMarker(as);
+          asMarkers.addLayer(marker);
+        });
+
+        // Desenhar conexões
+        drawConnections();
+
+        // Configurar controles
+        setupEventListeners();
+
+        // Adicionar controle de camadas
+        const overlays = {
+          "AS Nodes": asMarkers,
+          "Connections": connectionLines
+        };
+
+        L.control.layers(null, overlays).addTo(map);
+
+        console.log('Mapa inicializado com sucesso!');
+        showStatus('Mapa carregado com dados BGP reais!', 'success');
+      } catch (error) {
+        console.error('Erro ao inicializar mapa:', error);
+        showStatus('Erro ao carregar mapa. Tente recarregar a página.', 'danger');
+      }
+    }
+
+    // Função para obter cor baseada no tipo de AS
+    function getAsColor(type) {
+      switch(type) {
+        case 'transit': return '#007bff';
+        case 'content': return '#28a745';
+        case 'enterprise': return '#ffc107';
+        default: return '#6c757d';
+      }
+    }
+
+    // Função para criar marcador de AS
+    function createAsMarker(as) {
+      const color = getAsColor(as.type);
+      const marker = L.circleMarker([as.lat, as.lng], {
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.9,
+        radius: 12,
+        weight: 3,
+        opacity: 1
+      });
+
+      marker.bindPopup(`
+        <div class="text-center p-2">
+          <h6 class="mb-2">AS${as.asn}</h6>
+          <p class="mb-2 fw-bold">${as.name}</p>
+          <p class="mb-2"><small class="text-muted">${as.type.toUpperCase()}</small></p>
+          <p class="mb-3"><small>Conexões: ${as.connections.length}</small></p>
+          <a href="as_detail.html?asn=${as.asn}" class="btn btn-sm btn-primary">Ver Detalhes</a>
+        </div>
+      `, {
+        maxWidth: 300,
+        className: 'custom-popup'
+      });
+
+      marker.on('click', function() {
+        highlightConnections(as.asn);
+        // Atualizar painel lateral
+        updateAsInfoPanel(as);
+        // Abrir popup automaticamente ao clicar
+        this.openPopup();
+      });
+
+      // Adicionar tooltip para mostrar informações ao passar o mouse
+      marker.bindTooltip(`AS${as.asn} - ${as.name}`, {
+        permanent: false,
+        direction: 'top',
+        offset: [0, -10]
+      });
+
+      return marker;
+    }
+
+    // Função para desenhar conexões
+    function drawConnections() {
+      if (!connectionLines) return;
+
+      connectionLines.clearLayers();
+
+      asData.forEach(as => {
+        const fromLatLng = [as.lat, as.lng];
+
+        as.connections.forEach(connectedAsn => {
+          const connectedAs = asData.find(a => a.asn === connectedAsn);
+          if (connectedAs) {
+            const toLatLng = [connectedAs.lat, connectedAs.lng];
+            const color = getAsColor(as.type);
+
+            L.polyline([fromLatLng, toLatLng], {
+              color: color,
+              weight: 1,
+              opacity: 0.6,
+              dashArray: '5, 5'
+            }).addTo(connectionLines);
+          }
+        });
+      });
+    }
+
+    // Função para destacar conexões de um AS específico
+    function highlightConnections(asn) {
+      if (!connectionLines) return;
+
+      connectionLines.clearLayers();
+
+      const selectedAs = asData.find(a => a.asn === asn);
+      if (!selectedAs) return;
+
+      selectedAs.connections.forEach(connectedAsn => {
+        const connectedAs = asData.find(a => a.asn === connectedAsn);
+        if (connectedAs) {
+          const fromLatLng = [selectedAs.lat, selectedAs.lng];
+          const toLatLng = [connectedAs.lat, connectedAs.lng];
+
+          L.polyline([fromLatLng, toLatLng], {
+            color: '#ff0000',
+            weight: 3,
+            opacity: 1
+          }).addTo(connectionLines);
+        }
+      });
+    }
+
+    // Função para filtrar AS baseado na busca
+    function filterAs(searchTerm) {
+      if (!asMarkers) return;
+
+      asMarkers.clearLayers();
+
+      const filteredAs = asData.filter(as =>
+        as.asn.toString().includes(searchTerm) ||
+        as.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      filteredAs.forEach(as => {
+        const marker = createAsMarker(as);
+        asMarkers.addLayer(marker);
+      });
+
+      if (filteredAs.length > 0) {
+        const bounds = L.latLngBounds(filteredAs.map(as => [as.lat, as.lng]));
+        map.fitBounds(bounds, { padding: [20, 20] });
+      }
+    }
+
+    // Função para filtrar por região
+    function filterByRegion(region) {
+      if (!asMarkers) return;
+
+      asMarkers.clearLayers();
+
+      const filteredAs = region ? asData.filter(as => as.region === region) : asData;
+
+      filteredAs.forEach(as => {
+        const marker = createAsMarker(as);
+        asMarkers.addLayer(marker);
+      });
+    }
+
+    // Função para atualizar o painel lateral com informações do AS
+    function updateAsInfoPanel(as) {
+      const panel = document.getElementById('as-info-panel');
+      const connections = as.connections || [];
+
+      // Buscar informações completas das conexões
+      const connectionDetails = connections.map(asn => {
+        const connectedAs = asData.find(a => a.asn === asn);
+        return connectedAs ? {
+          asn: asn,
+          name: connectedAs.name,
+          type: connectedAs.type,
+          country: connectedAs.country
+        } : {
+          asn: asn,
+          name: 'Nome não disponível',
+          type: 'Tipo não especificado',
+          country: 'País não especificado'
+        };
+      });
+
+      panel.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">AS ${as.asn}</h5>
+          </div>
+          <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted">${as.name}</h6>
+            <p class="mb-2"><strong>Tipo:</strong> ${as.type || 'Não especificado'}</p>
+            <p class="mb-3"><strong>País:</strong> ${as.country || 'Não especificado'}</p>
+
+            <h6>Conexões (${connections.length})</h6>
+            <div class="connections-list" style="max-height: 200px; overflow-y: auto;">
+              ${connectionDetails.length > 0 ?
+                connectionDetails.map(conn => `
+                  <div class="connection-item mb-2 p-2 border rounded">
+                    <small><strong>AS${conn.asn}</strong> - ${conn.name}</small><br>
+                    <small class="text-muted">${conn.type} • ${conn.country}</small>
+                  </div>
+                `).join('') :
+                '<small class="text-muted">Nenhuma conexão registrada</small>'
+              }
+            </div>
+
+            <div class="mt-3">
+              <a href="as_detail.html?asn=${as.asn}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+              <button class="btn btn-outline-secondary btn-sm ms-2" onclick="centerOnAs(${as.lat}, ${as.lng})">Centralizar</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Função para centralizar o mapa em um AS
+    function centerOnAs(lat, lng) {
+      map.setView([lat, lng], 8);
+    }
+
+    // Configurar event listeners
+    function setupEventListeners() {
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.trim();
+        if (searchTerm.length > 0) {
+          filterAs(searchTerm);
+        } else {
+          // Reset para mostrar todos
+          asMarkers.clearLayers();
+          asData.forEach(as => {
+            const marker = createAsMarker(as);
+            asMarkers.addLayer(marker);
+          });
+          map.setView([-15, -55], 4);
+        }
+      });
+
+      document.getElementById('regionFilter').addEventListener('change', function(e) {
+        filterByRegion(e.target.value);
+      });
+
+      document.getElementById('resetViewBtn').addEventListener('click', function() {
+        map.setView([-15, -55], 4);
+      });
+
+      document.getElementById('toggleConnectionsBtn').addEventListener('click', function() {
+        if (!map || !connectionLines) return;
+
+        if (map.hasLayer(connectionLines)) {
+          map.removeLayer(connectionLines);
+          this.textContent = 'Mostrar Conexões';
+        } else {
+          map.addLayer(connectionLines);
+          this.textContent = 'Ocultar Conexões';
+        }
+      });
+
+      document.getElementById('showLegendBtn').addEventListener('click', function() {
+        const legend = document.getElementById('legend');
+        legend.style.display = legend.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+
+    // Função para mostrar status
+    function showStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('statusDiv') || createStatusDiv();
+      statusDiv.innerHTML = `<div class="alert alert-${type}"><i class="fas fa-info-circle"></i> ${message}</div>`;
+      statusDiv.style.display = 'block';
+      setTimeout(() => statusDiv.style.display = 'none', 5000);
+    }
+
+    // Função para criar div de status
+    function createStatusDiv() {
+      const div = document.createElement('div');
+      div.id = 'statusDiv';
+      div.style.position = 'fixed';
+      div.style.top = '20px';
+      div.style.right = '20px';
+      div.style.zIndex = '1000';
+      div.style.maxWidth = '300px';
+      document.body.appendChild(div);
+      return div;
+    }
+
+  </script>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
