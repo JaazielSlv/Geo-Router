@@ -1,0 +1,40 @@
+.as-quick-link {
+  transition: all 0.2s ease;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.as-quick-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.as-quick-link:active {
+  transform: translateY(0);
+}
+
+.flag-icon {
+  width: 20px;
+  height: 15px;
+  display: inline-block;
+  margin-right: 5px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 2px;
+}
+
+.flag-icon-br {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 15"><rect width="20" height="15" fill="%23009000"/><rect width="20" height="7.5" y="7.5" fill="%23FFCC00"/><circle cx="10" cy="7.5" r="3.5" fill="%2300247D"/><text x="10" y="8.5" text-anchor="middle" fill="%23FFFFFF" font-size="2.5" font-family="Arial">★</text></svg>');
+}
+
+.flag-icon-us {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 15"><rect width="20" height="15" fill="%23FFFFFF"/><rect width="20" height="2" fill="%23B22234"/><rect width="20" height="2" y="4" fill="%23B22234"/><rect width="20" height="2" y="8" fill="%23B22234"/><rect width="20" height="2" y="12" fill="%23B22234"/><rect width="20" height="2" y="2" fill="%23002837"/><rect width="20" height="2" y="6" fill="%23002837"/><rect width="20" height="2" y="10" fill="%23002837"/><rect width="20" height="2" y="14" fill="%23002837"/><rect width="7.5" height="7.5" fill="%23002837"/><g fill="%23FFFFFF"><circle cx="3.75" cy="3.75" r="0.3"/><circle cx="5.75" cy="1.75" r="0.3"/><circle cx="5.75" cy="3.75" r="0.3"/><circle cx="5.75" cy="5.75" r="0.3"/><circle cx="3.75" cy="1.75" r="0.3"/><circle cx="3.75" cy="5.75" r="0.3"/><circle cx="1.75" cy="3.75" r="0.3"/><circle cx="1.75" cy="1.75" r="0.3"/><circle cx="1.75" cy="5.75" r="0.3"/></g></svg>');
+}
+
+.flag-icon-se {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 15"><rect width="20" height="15" fill="%23006400"/><rect width="20" height="5" y="5" fill="%23FFCC00"/><rect width="5" height="15" x="7.5" fill="%23FFCC00"/></svg>');
+}
+
+.flag-icon-jp {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 15"><rect width="20" height="15" fill="%23FFFFFF"/><circle cx="10" cy="7.5" r="3" fill="%23BC002D"/></svg>');
+}
