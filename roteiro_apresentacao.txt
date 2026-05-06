@@ -1,0 +1,69 @@
+ROTEIRO DE APRESENTAÇÃO - GEOROUTE
+
+Participantes: Jaaziel, Cosme e Cauã
+
+1. ESTRUTURA DE DADOS E API - Cosme
+"Os dados do projeto estão centralizados no arquivo db/db.json, dentro do recurso autonomousSystems. Cada registro tem id, asn, org, country, type, routes, prefixes, upstreams, peers, description, lastUpdate, status e routeHistory."
+
+"Com essa estrutura, o json-server consegue simular uma API REST de forma simples e organizada. Isso facilita a leitura, a manutenção e também a explicação do que a aplicação consome."
+
+2. CONSUMO DE API - Cauã
+"A comunicação com os dados foi concentrada na classe GeoRouteApi, no arquivo js/api.js. Ela usa Fetch API para fazer as requisições GET, POST, PUT, PATCH e DELETE."
+
+"Também implementamos fallback: se o json-server não estiver disponível, a aplicação lê diretamente o db.json. Assim, o projeto continua funcionando e a consulta de dados não depende totalmente do servidor local."
+
+3. MANIPULAÇÃO DO DOM - Jaaziel
+"Na interface, a gente evitou montar conteúdo com HTML fixo e passou a criar os componentes dinamicamente. Na busca, por exemplo, os cards de resultado são montados com createElement, appendChild e DocumentFragment."
+
+"Na prática, o fluxo é: buscar os dados, filtrar o que interessa, criar os elementos manualmente e inserir tudo no DOM. Isso deixa mais fácil de mostrar na apresentação como a interface é construída a partir da API."
+
+4. BUSCA E EVENTOS - Cosme
+"A página de busca procura por ASN, nome da organização, país, tipo e prefixos. Os resultados são renderizados dinamicamente, e a interação é tratada com eventos de clique, Enter no campo de texto e atalhos de AS."
+
+"Esse comportamento mostra bem o uso de eventos no JavaScript e como a interface responde ao usuário sem recarregar a página."
+
+5. MAPA INTERATIVO - Cauã
+"No mapa, usamos Leaflet para exibir os AS como marcadores e desenhar as conexões entre eles. Cada clique em um marcador destaca as ligações relacionadas e abre o painel com informações do AS."
+
+"Além disso, o mapa também permite filtrar, centralizar e alternar as conexões exibidas. Isso mostra uma interação mais visual e ajuda a explicar a topologia dos Sistemas Autônomos."
+
+6. PÁGINA DE DETALHES - Jaaziel
+"Na página de detalhes, usamos os dados do JSON para mostrar informações completas do AS, como prefixos, upstreams, peers, status e histórico de rotas."
+
+"Também criamos um mini-grafo com D3.js para representar as conexões diretas do AS de forma visual. Essa parte ajuda a mostrar como os dados estruturados no JSON viram uma visualização interativa na tela."
+
+7. ORGANIZAÇÃO DO CÓDIGO - Jaaziel
+"O projeto foi dividido em módulos ESM para separar responsabilidades. O arquivo api.js concentra o acesso aos dados, utils.js reúne funções auxiliares e os arquivos search.js, map.js e as_detail.js usam essas funções para manter o código mais limpo."
+
+"Isso deixa o projeto mais organizado, mais fácil de manter e também mais simples de explicar durante a apresentação."
+
+8. FECHAMENTO - Todos
+"Com isso, o projeto atende aos pontos principais pedidos na disciplina: uso de JSON Server, consumo com Fetch API, manipulação manual do DOM, tratamento de eventos, ESM e organização clara do front-end."
+
+ORDEM SUGERIDA DE FALA
+- Cosme: estrutura dos dados, API e busca
+- Cauã: consumo da API e mapa interativo
+- Jaaziel: DOM, página de detalhes, organização do código e fechamento
+
+O QUE VAMOS FALAR PARA RESPONDER O PROFESSOR
+
+1. Estruturação e estilização das páginas
+"As páginas foram separadas por função, como busca, mapa, detalhes, sobre, contato e dashboard. A estilização usa Bootstrap 5.3.2 junto com CSS próprio em arquivos separados, para deixar o layout mais organizado e visualmente consistente."
+
+2. Estruturação de dados com JSON Server
+"Os dados ficam no db/db.json, dentro do recurso autonomousSystems. Cada registro tem informações como ASN, organização, país, tipo, prefixos, upstreams, peers, status e histórico de rotas. O json-server simula a API a partir dessa base."
+
+3. Consumo de API com Fetch
+"A comunicação com os dados é feita na classe GeoRouteApi, no arquivo js/api.js, usando Fetch API. O projeto faz requisições GET, POST, PUT, PATCH e DELETE, com tratamento de resposta e fallback para o db.json quando o servidor não está ativo."
+
+4. Manipulação do DOM e componentes dinâmicos
+"A interface é montada manualmente com createElement, appendChild, replaceChildren e DocumentFragment. Isso aparece principalmente na busca, onde os resultados viram cards dinâmicos, e também nas páginas de mapa e detalhes."
+
+5. Tratamento de eventos
+"Tratamos eventos de clique, tecla Enter, filtros de busca, seleção de região, clique nos marcadores do mapa e carregamento da página com DOMContentLoaded. Isso deixa a navegação mais interativa e responsiva ao usuário."
+
+6. Uso de ESM
+"O código está organizado em módulos ECMAScript. O arquivo api.js concentra o acesso aos dados, utils.js guarda funções auxiliares e search.js, map.js e as_detail.js importam o que precisam. Isso separa responsabilidades e deixa o projeto mais fácil de explicar."
+
+7. Entrega e organização do projeto
+"A entrega foi pensada para GitHub, com o código-fonte organizado em pastas, documentação em README e estrutura clara para mostrar a participação da equipe. A ideia é deixar tudo legível, reproduzível e fácil de avaliar."
