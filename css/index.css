@@ -1,0 +1,292 @@
+:root {
+  --bg: #040a16;
+  --text: #f1f7ff;
+  --muted: #c4d4e8;
+  --glass: rgba(8, 16, 34, 0.62);
+  --glass-border: rgba(138, 216, 255, 0.34);
+  --accent: #56ceff;
+  --accent2: #89ffbf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#sceneLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(86, 206, 255, 0.16), transparent 28%),
+    radial-gradient(circle at 84% 80%, rgba(137, 255, 191, 0.08), transparent 30%),
+    radial-gradient(circle at 50% 28%, rgba(58, 92, 162, 0.15), transparent 18%),
+    linear-gradient(180deg, #02050d 0%, #040914 44%, #02040a 100%);
+  overflow: hidden;
+}
+
+#sceneLayer::before,
+#sceneLayer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  opacity: 0.72;
+  transform: translateZ(0);
+}
+
+#sceneLayer::before {
+  background-image:
+    radial-gradient(circle at 12px 18px, rgba(255, 255, 255, 0.9) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 120px 80px, rgba(255, 255, 255, 0.75) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 200px 40px, rgba(165, 220, 255, 0.8) 0 1px, transparent 1.9px),
+    radial-gradient(circle at 80px 160px, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.8px);
+  background-size: 260px 220px;
+  opacity: 0.45;
+}
+
+#sceneLayer::after {
+  background-image:
+    radial-gradient(circle at 30% 25%, rgba(92, 142, 255, 0.14), transparent 0 18%),
+    radial-gradient(circle at 72% 18%, rgba(145, 94, 255, 0.08), transparent 0 16%),
+    radial-gradient(circle at 58% 74%, rgba(67, 185, 255, 0.08), transparent 0 20%);
+  filter: blur(10px);
+  opacity: 0.55;
+}
+
+#globeCanvas {
+  position: absolute;
+  inset: 0;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.18) 45%, rgba(0, 0, 0, 0.62) 100%),
+    linear-gradient(180deg, rgba(2, 8, 20, 0.12), rgba(2, 8, 20, 0.78));
+}
+
+.sections {
+  position: relative;
+  z-index: 2;
+}
+
+.screen {
+  min-height: 100vh;
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(14px, 3vw, 34px);
+  position: relative;
+  overflow: hidden;
+}
+
+.screenShade {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 9, 24, 0.24);
+}
+
+.screenContent {
+  position: relative;
+  z-index: 3;
+  width: min(1080px, 100%);
+  opacity: 0;
+  transform: translateY(46px);
+  transition: opacity 1.08s cubic-bezier(0.22, 1, 0.36, 1), transform 1.08s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.screen.is-active .screenContent {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#screen-2 .screenContent {
+  width: min(1400px, 100%);
+}
+
+.heroTitle {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+
+.heroTitle h1 {
+  margin: 0;
+  font-size: clamp(38px, 7vw, 86px);
+  letter-spacing: 0.11em;
+  font-weight: 800;
+  background: linear-gradient(180deg, #ffffff 0%, #b8e9ff 42%, #68d7ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 24px rgba(72, 199, 255, 0.18), 0 12px 30px rgba(0, 0, 0, 0.58);
+}
+
+.heroTitle p {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: clamp(13px, 1.8vw, 18px);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.twoCols {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.lateralLayout {
+  display: grid;
+  align-items: center;
+  grid-template-columns: minmax(300px, 1fr) minmax(280px, 1.35fr) minmax(300px, 1fr);
+  gap: clamp(14px, 2.8vw, 34px);
+  min-height: 70vh;
+}
+
+.lateralSpacer {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.card {
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 18px;
+  background: var(--glass);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.card h2,
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.lateralCard h2 {
+  font-size: clamp(28px, 2.6vw, 40px);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.card p {
+  margin: 0;
+  line-height: 1.6;
+  color: #d3e2f6;
+}
+
+.lateralCard p {
+  font-size: clamp(16px, 1.15vw, 20px);
+  line-height: 1.62;
+  color: #e2eeff;
+}
+
+.badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #001925;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+.gridOptions {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.option {
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: var(--glass);
+  backdrop-filter: blur(6px);
+  padding: 18px;
+  text-decoration: none;
+  color: var(--text);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(160, 228, 255, 0.82);
+}
+
+.option h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.option p {
+  margin: 0;
+  color: #d1dff2;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.descHint {
+  margin-top: 16px;
+  text-align: center;
+  color: #cfe0f2;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  #screen-2 .screenContent {
+    width: min(1080px, 100%);
+  }
+
+  .twoCols {
+    grid-template-columns: 1fr;
+  }
+
+  .lateralLayout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .lateralSpacer {
+    display: none;
+  }
+
+  .gridOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .screen {
+    align-items: flex-start;
+    padding-top: 88px;
+  }
+}

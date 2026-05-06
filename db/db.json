@@ -1,0 +1,160 @@
+{
+  "autonomousSystems": [
+    {
+      "id": 28513,
+      "asn": 28513,
+      "label": "AS28513",
+      "org": "Claro S.A.",
+      "country": "BR",
+      "type": "transit",
+      "routes": 1250,
+      "prefixes": ["200.192.0.0/16", "201.6.0.0/16", "189.40.0.0/16"],
+      "upstreams": ["AS3356", "AS1299", "AS3257"],
+      "peers": ["AS27699", "AS4230"]
+    },
+    {
+      "id": 27699,
+      "asn": 27699,
+      "label": "AS27699",
+      "org": "Telecom Italia S.p.A.",
+      "country": "BR",
+      "type": "transit",
+      "routes": 980,
+      "prefixes": ["191.5.0.0/16", "191.36.0.0/16"],
+      "upstreams": ["AS3356", "AS1299"],
+      "peers": ["AS28513", "AS4230"]
+    },
+    {
+      "id": 4230,
+      "asn": 4230,
+      "label": "AS4230",
+      "org": "Embratel",
+      "country": "BR",
+      "type": "transit",
+      "routes": 1450,
+      "prefixes": ["200.192.0.0/16", "200.219.0.0/16"],
+      "upstreams": ["AS3356", "AS1299", "AS3257"],
+      "peers": ["AS28513", "AS27699"]
+    },
+    {
+      "id": 53006,
+      "asn": 53006,
+      "label": "AS53006",
+      "org": "Algar Telecom",
+      "country": "BR",
+      "type": "transit",
+      "routes": 320,
+      "prefixes": ["177.223.0.0/16", "191.185.0.0/16"],
+      "upstreams": ["AS3356", "AS28513"],
+      "peers": ["AS27699"]
+    },
+    {
+      "id": 262287,
+      "asn": 262287,
+      "label": "AS262287",
+      "org": "Maxx Telecom",
+      "country": "BR",
+      "type": "transit",
+      "routes": 180,
+      "prefixes": ["177.54.0.0/16", "177.55.0.0/16"],
+      "upstreams": ["AS28513", "AS27699"],
+      "peers": ["AS4230"]
+    },
+    {
+      "id": 28186,
+      "asn": 28186,
+      "label": "AS28186",
+      "org": "ITS Telecom",
+      "country": "BR",
+      "type": "transit",
+      "routes": 95,
+      "prefixes": ["189.89.0.0/16", "189.90.0.0/16"],
+      "upstreams": ["AS28513", "AS3356"],
+      "peers": ["AS27699"]
+    },
+    {
+      "id": 14840,
+      "asn": 14840,
+      "label": "AS14840",
+      "org": "BR.Digital Provider",
+      "country": "BR",
+      "type": "transit",
+      "routes": 75,
+      "prefixes": ["177.101.0.0/16", "177.102.0.0/16"],
+      "upstreams": ["AS28513", "AS27699"],
+      "peers": ["AS4230"]
+    },
+    {
+      "id": 1916,
+      "asn": 1916,
+      "label": "AS1916",
+      "org": "Rede Nacional de Ensino e Pesquisa",
+      "country": "BR",
+      "type": "enterprise",
+      "routes": 200,
+      "prefixes": ["200.128.0.0/16", "200.129.0.0/16"],
+      "upstreams": ["AS28513", "AS27699"],
+      "peers": ["AS4230"]
+    },
+    {
+      "id": 3356,
+      "asn": 3356,
+      "label": "AS3356",
+      "org": "Level 3 Communications",
+      "country": "US",
+      "type": "transit",
+      "routes": 8500,
+      "prefixes": ["4.0.0.0/8", "8.0.0.0/8"],
+      "upstreams": [],
+      "peers": ["AS1299", "AS3257"]
+    },
+    {
+      "id": 1299,
+      "asn": 1299,
+      "label": "AS1299",
+      "org": "Telia Company AB",
+      "country": "SE",
+      "type": "transit",
+      "routes": 6200,
+      "prefixes": ["95.0.0.0/8", "213.0.0.0/8"],
+      "upstreams": [],
+      "peers": ["AS3356", "AS3257"]
+    },
+    {
+      "id": 3257,
+      "asn": 3257,
+      "label": "AS3257",
+      "org": "GTT Communications",
+      "country": "US",
+      "type": "transit",
+      "routes": 4100,
+      "prefixes": ["173.0.0.0/8", "199.0.0.0/8"],
+      "upstreams": [],
+      "peers": ["AS3356", "AS1299"]
+    },
+    {
+      "id": 174,
+      "asn": 174,
+      "label": "AS174",
+      "org": "Cogent Communications",
+      "country": "US",
+      "type": "transit",
+      "routes": 3800,
+      "prefixes": ["38.0.0.0/8", "66.0.0.0/8"],
+      "upstreams": [],
+      "peers": ["AS3356"]
+    },
+    {
+      "id": 2914,
+      "asn": 2914,
+      "label": "AS2914",
+      "org": "NTT America, Inc.",
+      "country": "JP",
+      "type": "transit",
+      "routes": 7200,
+      "prefixes": ["128.0.0.0/8", "129.0.0.0/8"],
+      "upstreams": [],
+      "peers": ["AS3356", "AS1299"]
+    }
+  ]
+}

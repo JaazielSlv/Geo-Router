@@ -1,5 +1,191 @@
 /* Arquivo principal de estilos customizados do projeto. Adicione aqui regras específicas além do Bootstrap. */
 
+:root {
+  --geo-bg: #040a16;
+  --geo-panel: rgba(8, 16, 34, 0.82);
+  --geo-panel-strong: rgba(10, 20, 42, 0.94);
+  --geo-border: rgba(138, 216, 255, 0.22);
+  --geo-text: #f1f7ff;
+  --geo-text-muted: #c4d4e8;
+  --geo-accent: #56ceff;
+  --geo-accent-2: #89ffbf;
+}
+
+body.georouter-page {
+  min-height: 100vh;
+  color: var(--geo-text);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(86, 206, 255, 0.12), transparent 28%),
+    radial-gradient(circle at 84% 80%, rgba(137, 255, 191, 0.06), transparent 30%),
+    linear-gradient(180deg, #02050d 0%, #040914 44%, #02040a 100%);
+}
+
+body.georouter-page main {
+  position: relative;
+  z-index: 1;
+}
+
+body.georouter-page .navbar {
+  background: linear-gradient(90deg, rgba(8, 16, 34, 0.96), rgba(6, 12, 26, 0.92)) !important;
+  border-bottom: 1px solid rgba(138, 216, 255, 0.12);
+}
+
+body.georouter-page .navbar-brand,
+body.georouter-page .nav-link,
+body.georouter-page .offcanvas-title,
+body.georouter-page .form-label,
+body.georouter-page h1,
+body.georouter-page h2,
+body.georouter-page h3,
+body.georouter-page h4,
+body.georouter-page h5,
+body.georouter-page h6,
+body.georouter-page p,
+body.georouter-page li,
+body.georouter-page small,
+body.georouter-page span {
+  color: var(--geo-text);
+}
+
+body.georouter-page .text-muted {
+  color: var(--geo-text-muted) !important;
+}
+
+body.georouter-page .offcanvas {
+  background: rgba(5, 12, 26, 0.98);
+  color: var(--geo-text);
+  border-right: 1px solid rgba(138, 216, 255, 0.14);
+}
+
+body.georouter-page .nav-link {
+  color: var(--geo-text-muted) !important;
+}
+
+body.georouter-page .nav-link.active,
+body.georouter-page .nav-link:hover {
+  color: #ffffff !important;
+}
+
+body.georouter-page .card,
+body.georouter-page .alert,
+body.georouter-page .table,
+body.georouter-page .map-container,
+body.georouter-page #map,
+body.georouter-page .bg-light,
+body.georouter-page .bg-white {
+  background: var(--geo-panel) !important;
+  color: var(--geo-text);
+  border-color: var(--geo-border) !important;
+}
+
+body.georouter-page .card,
+body.georouter-page .alert,
+body.georouter-page .map-container,
+body.georouter-page #map {
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+}
+
+body.georouter-page .card-header {
+  background: var(--geo-panel-strong) !important;
+  border-bottom: 1px solid rgba(138, 216, 255, 0.14) !important;
+}
+
+body.georouter-page .card-body,
+body.georouter-page .card-title,
+body.georouter-page .card-text,
+body.georouter-page .list-group-item,
+body.georouter-page .table td,
+body.georouter-page .table th,
+body.georouter-page .alert,
+body.georouter-page .form-control,
+body.georouter-page .form-select,
+body.georouter-page .input-group-text,
+body.georouter-page .modal-content,
+body.georouter-page .dropdown-menu,
+body.georouter-page .offcanvas-body {
+  color: var(--geo-text);
+}
+
+body.georouter-page .form-control,
+body.georouter-page .form-select,
+body.georouter-page textarea,
+body.georouter-page input {
+  background: rgba(4, 10, 22, 0.9) !important;
+  border-color: rgba(138, 216, 255, 0.22) !important;
+  color: var(--geo-text) !important;
+}
+
+body.georouter-page .form-control::placeholder,
+body.georouter-page textarea::placeholder,
+body.georouter-page input::placeholder {
+  color: rgba(196, 212, 232, 0.7) !important;
+}
+
+body.georouter-page .btn-primary {
+  border-color: rgba(86, 206, 255, 0.4) !important;
+  background: linear-gradient(135deg, #4bb7f2, #255fdf) !important;
+}
+
+body.georouter-page .btn-outline-primary,
+body.georouter-page .btn-outline-secondary,
+body.georouter-page .btn-outline-info,
+body.georouter-page .btn-outline-success,
+body.georouter-page .btn-outline-light {
+  border-color: rgba(138, 216, 255, 0.35) !important;
+  color: #eaf4ff !important;
+}
+
+body.georouter-page .btn-outline-primary:hover,
+body.georouter-page .btn-outline-secondary:hover,
+body.georouter-page .btn-outline-info:hover,
+body.georouter-page .btn-outline-success:hover,
+body.georouter-page .btn-outline-light:hover {
+  background: rgba(86, 206, 255, 0.14) !important;
+}
+
+body.georouter-page .table thead th {
+  background: rgba(10, 20, 42, 0.96) !important;
+  color: var(--geo-text);
+}
+
+body.georouter-page .table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: rgba(255, 255, 255, 0.025);
+  color: var(--geo-text);
+}
+
+body.georouter-page .alert-info,
+body.georouter-page .alert-warning,
+body.georouter-page .alert-danger,
+body.georouter-page .alert-success {
+  background: rgba(8, 16, 34, 0.88) !important;
+  border-color: rgba(138, 216, 255, 0.18) !important;
+}
+
+body.georouter-page footer {
+  background: rgba(4, 9, 20, 0.96) !important;
+  border-top: 1px solid rgba(138, 216, 255, 0.12) !important;
+}
+
+body.georouter-page .map-container,
+body.georouter-page #map {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(86, 206, 255, 0.1), transparent 24%),
+    radial-gradient(circle at 84% 80%, rgba(137, 255, 191, 0.06), transparent 26%),
+    rgba(6, 12, 26, 0.94) !important;
+}
+
+body.georouter-page .btn,
+body.georouter-page .form-control,
+body.georouter-page .form-select,
+body.georouter-page .card,
+body.georouter-page .alert,
+body.georouter-page .offcanvas,
+body.georouter-page footer,
+body.georouter-page .map-container,
+body.georouter-page #map {
+  backdrop-filter: blur(6px);
+}
+
 /* Estilos para a página de detalhes do AS */
 .hover-bg-light:hover {
   background-color: #f8f9fa !important;
