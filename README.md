@@ -4,13 +4,6 @@ Aplicação front-end em React para visualização e investigação de Sistemas 
 
 Este projeto passou por uma migração para React como ideiao do professor, com o objetivo de modernizar a base, organizar melhor as rotas e manter o visual original do site.
 
-## O que mudou
-
-- A antiga interface em HTML e JavaScript puro foi migrada para React + Vite.
-- A home preserva o globo 3D e as telas em scroll, com o mesmo visual escuro e translúcido.
-- As páginas de busca, mapa, detalhe, dashboard, sobre e contato agora são rotas React.
-- Foi criada uma página de gerenciamento para adicionar, editar, remover e restaurar AS.
-- A base de dados é mantida no navegador via localStorage, usando `db/db.json` como seed inicial.
 
 ## Tecnologias
 
