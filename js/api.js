@@ -1,17 +1,22 @@
-export const API_BASE_URL = 'http://localhost:3000/autonomousSystems';
-export const FALLBACK_DATABASE_URL = new URL('../db/db.json', window.location.href).href;
+export const API_BASE_URL = '/api/autonomousSystems';
 
 export class GeoRouteApi {
   constructor(baseUrl) {
     this.baseUrl = baseUrl;
   }
 
+  buildHeaders(additionalHeaders = {}) {
+    return {
+      'Content-Type': 'application/json',
+      ...additionalHeaders
+    };
+  }
+
   async request(path = '', options = {}) {
+    const headers = this.buildHeaders(options.headers);
+
     const response = await fetch(`${this.baseUrl}${path}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-      },
+      headers,
       ...options
     });
 
@@ -28,11 +33,60 @@ export class GeoRouteApi {
     return response.json();
   }
 
-  async loadFallbackDatabase() {
-    const response = await fetch(FALLBACK_DATABASE_URL);
+  listAS() {
+    return this.request();
+  }
+
+  getAS(id) {
+    return this.request(`/${id}`);
+  }
+
+  createAS(payload, token) {
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return this.request('', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+  }
+
+  updateAS(id, payload, token) {
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return this.request(`/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(payload)
+    });
+  }
+
+  patchAS(id, payload, token) {
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return this.request(`/${id}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(payload)
+    });
+  }
+
+  deleteAS(id, token) {
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    return this.request(`/${id}`, {
+      method: 'DELETE',
+      headers
+    });
+  }
+
+  async login(email, password) {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
 
     if (!response.ok) {
-      const error = new Error(`Falha ao carregar db.json: ${response.status}`);
+      const error = new Error(`Falha na requisição: ${response.status}`);
       error.status = response.status;
       throw error;
     }
@@ -40,53 +94,18 @@ export class GeoRouteApi {
     return response.json();
   }
 
-  listAS() {
-    return this.request().catch(async error => {
-      if (error instanceof TypeError) {
-        const database = await this.loadFallbackDatabase();
-        return database.autonomousSystems || [];
-      }
+  async getDashboardSummary() {
+    const response = await fetch('/api/dashboard/summary', {
+      headers: this.buildHeaders()
+    });
 
+    if (!response.ok) {
+      const error = new Error(`Falha na requisição: ${response.status}`);
+      error.status = response.status;
       throw error;
-    });
-  }
+    }
 
-  getAS(id) {
-    return this.request(`/${id}`).catch(async error => {
-      if (error instanceof TypeError) {
-        const database = await this.loadFallbackDatabase();
-        return (database.autonomousSystems || []).find(item => String(item.id) === String(id) || String(item.asn) === String(id)) || null;
-      }
-
-      throw error;
-    });
-  }
-
-  createAS(payload) {
-    return this.request('', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-  }
-
-  updateAS(id, payload) {
-    return this.request(`/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(payload)
-    });
-  }
-
-  patchAS(id, payload) {
-    return this.request(`/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(payload)
-    });
-  }
-
-  deleteAS(id) {
-    return this.request(`/${id}`, {
-      method: 'DELETE'
-    });
+    return response.json();
   }
 }
 

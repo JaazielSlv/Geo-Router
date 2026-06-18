@@ -53,12 +53,12 @@ function normalizeDetailRecord(record, lookup) {
     asn: `AS${asn}`,
     org: record.org || record.name || `AS${asn}`,
     country: record.country || 'BR',
-    description: record.description || `Dados carregados do JSON local para ${record.org || `AS${asn}`}.`,
+    description: record.description || `Dados carregados via API backend para ${record.org || `AS${asn}`}.`,
     prefixes: Array.isArray(record.prefixes) ? record.prefixes : [],
     upstreams: enrichConnections(upstreamValues, lookup),
     peers: enrichConnections(peerValues, lookup),
     routes: record.routes || (Array.isArray(record.prefixes) ? record.prefixes.length * 100 : 0),
-    lastUpdate: record.lastUpdate || 'Carregado do db.json',
+    lastUpdate: record.lastUpdate || 'Dados atualizados via API backend',
     status: record.status || 'Ativo',
     type: record.type || 'transit',
     routeHistory: Array.isArray(record.routeHistory) ? record.routeHistory : buildRouteHistory(record),
@@ -70,8 +70,7 @@ function normalizeDetailRecord(record, lookup) {
 }
 
 async function loadDetailData() {
-  const database = await geoRouteApi.loadFallbackDatabase();
-  const records = Array.isArray(database.autonomousSystems) ? database.autonomousSystems : [];
+  const records = await geoRouteApi.listAS();
   const lookup = buildLookup(records);
   const normalized = new Map();
 
@@ -88,7 +87,7 @@ function renderNotFound() {
   document.getElementById('info').innerHTML = `
     <div class="alert alert-warning">
       <h4 class="alert-heading">ASN não encontrado</h4>
-      <p>O Sistema Autônomo solicitado não foi encontrado no JSON local.</p>
+      <p>O Sistema Autônomo solicitado não foi encontrado na API backend.</p>
       <hr>
       <p class="mb-0">Tente buscar por outro ASN na página de <a href="search.html">busca</a>.</p>
     </div>

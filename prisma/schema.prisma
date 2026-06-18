@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model AutonomousSystem {
+  id           Int      @id @default(autoincrement())
+  asn          Int      @unique
+  label        String?
+  org          String
+  country      String?
+  type         String?
+  routes       Int?
+  prefixes     Json?
+  upstreams    Json?
+  peers        Json?
+  description  String?
+  lastUpdate   String?
+  status       String?
+  routeHistory Json?
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+}

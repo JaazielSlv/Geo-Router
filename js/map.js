@@ -61,9 +61,7 @@ function normalizeMapRecord(record) {
 }
 
 async function loadMapData() {
-  const database = await geoRouteApi.loadFallbackDatabase();
-  const records = Array.isArray(database.autonomousSystems) ? database.autonomousSystems : [];
-
+  const records = await geoRouteApi.listAS();
   asData = records.map(normalizeMapRecord);
   asIndex = new Map(asData.map(item => [item.asn, item]));
 }
@@ -94,7 +92,7 @@ async function initializeMap() {
       'Connections': connectionLines
     }).addTo(map);
 
-    showStatus('Mapa carregado com dados do JSON local!', 'success');
+    showStatus('Mapa carregado via API backend.', 'success');
   } catch (error) {
     console.error('Erro ao inicializar mapa:', error);
     showStatus('Erro ao carregar mapa. Tente recarregar a página.', 'danger');

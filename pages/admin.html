@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin GeoRoute BR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/Geo-Router/css/style.css">
+  <style>
+    .status-badge { min-width: 80px; }
+  </style>
+</head>
+<body class="georouter-page">
+  <header>
+    <nav class="navbar navbar-light bg-primary shadow-sm">
+      <div class="container-fluid">
+        <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+          <svg xmlns='http://www.w3.org/2000/svg' width='28' height='28' fill='currentColor' class='bi bi-list' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M2.5 12a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-4a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z'/></svg>
+        </button>
+        <span class="navbar-brand mb-0 h1 text-white">Admin GeoRoute BR</span>
+      </div>
+    </nav>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="nav flex-column">
+          <li class="nav-item mb-2"><a class="nav-link" href="../index.html">Home</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="map.html">Mapa</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="search.html">Busca</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="as_detail.html">Detalhe AS</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="about.html">Sobre</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="contact.html">Contato</a></li>
+          <li class="nav-item mb-2"><a class="nav-link active text-primary fw-bold" href="admin.html">Admin</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="display-5">Administração GeoRoute</h2>
+        <p class="text-muted">Painel de edição e monitoramento de AS via API.</p>
+      </div>
+      <button id="refreshBtn" class="btn btn-primary">Atualizar dados</button>
+    </div>
+
+    <div class="row gy-4 mb-4">
+      <div class="col-12 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">Login administrativo</h5>
+            <form id="loginForm">
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label">Email</label>
+                <input id="loginEmail" type="email" class="form-control" placeholder="admin@georoute.local" required />
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Senha</label>
+                <input id="loginPassword" type="password" class="form-control" placeholder="********" required />
+              </div>
+              <button id="loginBtn" class="btn btn-primary w-100" type="submit">Entrar</button>
+            </form>
+            <div id="loginStatus" class="mt-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div id="adminActions" class="card shadow-sm d-none">
+          <div class="card-body">
+            <h5 class="card-title">Acesso autorizado</h5>
+            <p class="text-muted">Você está conectado como administrador. Carregue e edite registros de AS.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="summaryCards" class="row g-4 mb-4"></div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Buscar AS</h5>
+        <div class="input-group mb-3">
+          <input id="adminSearchInput" type="text" class="form-control" placeholder="Digite ASN ou organização" />
+          <button id="adminSearchBtn" class="btn btn-outline-primary">Buscar</button>
+        </div>
+        <div id="adminResults"></div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Criar / Editar AS</h5>
+        <form id="adminForm">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">ASN</label>
+              <input id="formAsn" type="number" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Org</label>
+              <input id="formOrg" type="text" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">País</label>
+              <input id="formCountry" type="text" class="form-control" value="BR" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Tipo</label>
+              <select id="formType" class="form-select">
+                <option value="transit">Transit</option>
+                <option value="enterprise">Enterprise</option>
+                <option value="content">Content</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-3">
+            <div class="col-md-4">
+              <label class="form-label">Rotas</label>
+              <input id="formRoutes" type="number" class="form-control" value="0" />
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">Prefixos (vírgula separada)</label>
+              <input id="formPrefixes" type="text" class="form-control" placeholder="200.192.0.0/16, 201.6.0.0/16" />
+            </div>
+          </div>
+
+          <div class="row g-3 mt-3">
+            <div class="col-md-6">
+              <label class="form-label">Upstreams</label>
+              <input id="formUpstreams" type="text" class="form-control" placeholder="AS3356, AS1299" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Peers</label>
+              <input id="formPeers" type="text" class="form-control" placeholder="AS27699, AS4230" />
+            </div>
+          </div>
+
+          <div class="row g-3 mt-3">
+            <div class="col-md-12">
+              <label class="form-label">Descrição</label>
+              <textarea id="formDescription" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <button id="createBtn" class="btn btn-success" type="submit">Salvar</button>
+            <button id="updateBtn" class="btn btn-primary" type="button">Atualizar</button>
+            <button id="deleteBtn" class="btn btn-danger" type="button">Excluir</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="adminMessage"></div>
+  </main>
+
+  <footer class="bg-light border-top mt-auto py-3">
+    <div class="container text-center text-muted small">
+      &copy; 2026 GeoRoute BR. Todos os direitos reservados.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/main.js"></script>
+  <script type="module" src="../js/admin.js"></script>
+</body>
+</html>
