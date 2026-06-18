@@ -19,7 +19,7 @@ Este projeto passou por uma migração para React como ideiao do professor, com 
 - `index.html`: entrada do app React
 - `src/App.jsx`: rotas e layout global
 - `src/components/`: header, footer e globo 3D
-- `src/pages/`: home, busca, mapa, detalhe, dashboard, sobre, contato e CRUD
+- `src/pages/`: home, busca, mapa, detalhe, sobre e CRUD
 - `src/context/SystemsContext.jsx`: estado compartilhado dos AS
 - `src/lib/as.js`: normalização e utilitários de domínio
 - `db/db.json`: base inicial dos Sistemas Autônomos

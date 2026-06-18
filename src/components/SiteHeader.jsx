@@ -3,13 +3,11 @@ import { NavLink } from 'react-router-dom';
 
 const links = [
   { to: '/', label: 'Home', end: true },
-  { to: '/dashboard', label: 'Dashboard' },
   { to: '/search', label: 'Busca' },
   { to: '/map', label: 'Mapa' },
   { to: '/as/28513', label: 'Detalhe AS' },
   { to: '/admin', label: 'Gerenciar AS' },
-  { to: '/about', label: 'Sobre' },
-  { to: '/contact', label: 'Contato' }
+  { to: '/about', label: 'Sobre' }
 ];
 
 export function SiteHeader() {

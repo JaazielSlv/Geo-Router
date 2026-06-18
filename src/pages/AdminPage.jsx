@@ -237,7 +237,7 @@ export function AdminPage() {
             <div className="detail-card-head">
               <h3>Dica</h3>
             </div>
-            <p className="muted-line">Os dados salvos aqui atualizam busca, mapa, detalhe e dashboard automaticamente.</p>
+            <p className="muted-line">Os dados salvos aqui atualizam busca, mapa e detalhe automaticamente.</p>
             <Link className="btn btn-primary" to="/search">Testar a busca</Link>
           </section>
         </div>
