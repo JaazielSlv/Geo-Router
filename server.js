@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import routes from './server/routes/index.js';
+import { errorMiddleware } from './server/middleware/errorMiddleware.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +51,7 @@ app.use('/api', routes);
 app.use(express.static(path.join(__dirname)));
 app.use('/Geo-Router', express.static(path.join(__dirname)));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.use(errorMiddleware);
 
 function startServer() {
   app.listen(PORT, () => {
@@ -58,7 +60,9 @@ function startServer() {
   });
 }
 
-if (process.env.NODE_ENV !== 'test') {
+const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === __filename;
+
+if (process.env.NODE_ENV !== 'test' && isDirectExecution) {
   startServer();
 }
 

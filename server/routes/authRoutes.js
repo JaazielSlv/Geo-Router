@@ -1,6 +1,9 @@
 import express from 'express';
 import { register, login, profile } from '../controllers/authController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
+import { catchAsync } from '../middleware/asyncHandler.js';
+import { validateRequest } from '../middleware/validationMiddleware.js';
+import { loginValidator, registerValidator } from '../validators/authValidator.js';
 
 const router = express.Router();
 
@@ -30,7 +33,7 @@ const router = express.Router();
  *       400:
  *         description: Dados inválidos
  */
-router.post('/register', register);
+router.post('/register', registerValidator, validateRequest, catchAsync(register));
 
 /**
  * @openapi
@@ -56,7 +59,7 @@ router.post('/register', register);
  *       401:
  *         description: Credenciais inválidas
  */
-router.post('/login', login);
+router.post('/login', loginValidator, validateRequest, catchAsync(login));
 
 /**
  * @openapi
@@ -73,6 +76,6 @@ router.post('/login', login);
  *       401:
  *         description: Token inválido ou não informado
  */
-router.get('/profile', authMiddleware, profile);
+router.get('/profile', authMiddleware, catchAsync(profile));
 
 export default router;

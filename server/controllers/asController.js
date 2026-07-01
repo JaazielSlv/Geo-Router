@@ -1,5 +1,11 @@
 import prisma from '../services/prismaClient.js';
 
+function createHttpError(status, message) {
+  const error = new Error(message);
+  error.statusCode = status;
+  return error;
+}
+
 function parseIdentifier(value) {
   if (typeof value === 'string') {
     const cleaned = value.replace(/^AS/i, '').trim();
@@ -11,112 +17,136 @@ function parseIdentifier(value) {
   return Number.isInteger(numeric) ? numeric : null;
 }
 
-export async function getAllAS(req, res) {
-  const items = await prisma.autonomousSystem.findMany({ orderBy: { id: 'asc' } });
-  res.json(items);
+export async function getAllAS(req, res, next) {
+  try {
+    const items = await prisma.autonomousSystem.findMany({ orderBy: { id: 'asc' } });
+    res.json(items);
+  } catch (error) {
+    next(error);
+  }
 }
 
-export async function getASById(req, res) {
+export async function getASById(req, res, next) {
   const { id } = req.params;
   const numeric = parseIdentifier(id);
 
-  const item = await prisma.autonomousSystem.findFirst({
-    where: {
-      OR: [
-        numeric !== null ? { id: numeric } : undefined,
-        numeric !== null ? { asn: numeric } : undefined
-      ]
+  try {
+    const item = await prisma.autonomousSystem.findFirst({
+      where: {
+        OR: [
+          numeric !== null ? { id: numeric } : undefined,
+          numeric !== null ? { asn: numeric } : undefined
+        ]
+      }
+    });
+
+    if (!item) {
+      return next(createHttpError(404, 'AS não encontrado.'));
     }
-  });
 
-  if (!item) {
-    return res.status(404).json({ error: 'AS não encontrado.' });
+    res.json(item);
+  } catch (error) {
+    next(error);
   }
-
-  res.json(item);
 }
 
-export async function createAS(req, res) {
+export async function createAS(req, res, next) {
   const data = req.body;
   const requiredFields = ['asn', 'org'];
 
   if (!requiredFields.every(field => field in data && data[field] !== undefined && data[field] !== null && data[field] !== '')) {
-    return res.status(400).json({ error: 'Campos obrigatórios: asn, org.' });
+    return next(createHttpError(400, 'Campos obrigatórios: asn, org.'));
   }
 
-  const item = await prisma.autonomousSystem.create({ data });
-  res.status(201).json(item);
+  try {
+    const item = await prisma.autonomousSystem.create({ data });
+    res.status(201).json(item);
+  } catch (error) {
+    next(error);
+  }
 }
 
-export async function updateAS(req, res) {
+export async function updateAS(req, res, next) {
   const { id } = req.params;
   const data = req.body;
   const numeric = parseIdentifier(id);
 
-  const existing = await prisma.autonomousSystem.findFirst({
-    where: {
-      OR: [
-        numeric !== null ? { id: numeric } : undefined,
-        numeric !== null ? { asn: numeric } : undefined
-      ]
+  try {
+    const existing = await prisma.autonomousSystem.findFirst({
+      where: {
+        OR: [
+          numeric !== null ? { id: numeric } : undefined,
+          numeric !== null ? { asn: numeric } : undefined
+        ]
+      }
+    });
+
+    if (!existing) {
+      return next(createHttpError(404, 'AS não encontrado.'));
     }
-  });
 
-  if (!existing) {
-    return res.status(404).json({ error: 'AS não encontrado.' });
+    const updated = await prisma.autonomousSystem.update({
+      where: { id: existing.id },
+      data
+    });
+
+    res.json(updated);
+  } catch (error) {
+    next(error);
   }
-
-  const updated = await prisma.autonomousSystem.update({
-    where: { id: existing.id },
-    data
-  });
-
-  res.json(updated);
 }
 
-export async function patchAS(req, res) {
+export async function patchAS(req, res, next) {
   const { id } = req.params;
   const data = req.body;
   const numeric = parseIdentifier(id);
 
-  const existing = await prisma.autonomousSystem.findFirst({
-    where: {
-      OR: [
-        numeric !== null ? { id: numeric } : undefined,
-        numeric !== null ? { asn: numeric } : undefined
-      ]
+  try {
+    const existing = await prisma.autonomousSystem.findFirst({
+      where: {
+        OR: [
+          numeric !== null ? { id: numeric } : undefined,
+          numeric !== null ? { asn: numeric } : undefined
+        ]
+      }
+    });
+
+    if (!existing) {
+      return next(createHttpError(404, 'AS não encontrado.'));
     }
-  });
 
-  if (!existing) {
-    return res.status(404).json({ error: 'AS não encontrado.' });
+    const updated = await prisma.autonomousSystem.update({
+      where: { id: existing.id },
+      data
+    });
+
+    res.json(updated);
+  } catch (error) {
+    next(error);
   }
-
-  const updated = await prisma.autonomousSystem.update({
-    where: { id: existing.id },
-    data
-  });
-
-  res.json(updated);
 }
 
-export async function deleteAS(req, res) {
+export async function deleteAS(req, res, next) {
   const { id } = req.params;
   const numeric = parseIdentifier(id);
 
-  const existing = await prisma.autonomousSystem.findFirst({
-    where: {
-      OR: [
-        numeric !== null ? { id: numeric } : undefined,
-        numeric !== null ? { asn: numeric } : undefined
-      ]
+  try {
+    const existing = await prisma.autonomousSystem.findFirst({
+      where: {
+        OR: [
+          numeric !== null ? { id: numeric } : undefined,
+          numeric !== null ? { asn: numeric } : undefined
+        ]
+      }
+    });
+
+    if (!existing) {
+      return next(createHttpError(404, 'AS não encontrado.'));
     }
-  });
 
-  if (!existing) {
-    return res.status(404).json({ error: 'AS não encontrado.' });
+    await prisma.autonomousSystem.delete({ where: { id: existing.id } });
+    res.status(204).send();
+  } catch (error) {
+    next(error);
   }
-
-  await prisma.autonomousSystem.delete({ where: { id: existing.id } });
-  res.status(204).send();
 }

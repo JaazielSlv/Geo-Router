@@ -16,14 +16,29 @@ export class GeoRouteApi {
     const { headers: extraHeaders, ...rest } = options;
     const headers = this.buildHeaders(extraHeaders);
 
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      headers,
-      ...rest
-    });
+    let response;
+    try {
+      response = await fetch(`${this.baseUrl}${path}`, {
+        headers,
+        ...rest
+      });
+    } catch (error) {
+      const networkError = new Error('Falha de rede ao comunicar com a API.');
+      networkError.cause = error;
+      throw networkError;
+    }
+
+    let payload = null;
+    const contentType = response.headers?.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      payload = await response.json().catch(() => null);
+    }
 
     if (!response.ok) {
-      const error = new Error(`Falha na requisição: ${response.status}`);
+      const message = payload?.error || payload?.message || `Falha na requisição: ${response.status}`;
+      const error = new Error(message);
       error.status = response.status;
+      error.details = payload?.details;
       throw error;
     }
 
@@ -31,7 +46,7 @@ export class GeoRouteApi {
       return null;
     }
 
-    return response.json();
+    return payload ?? response.text();
   }
 
   listAS() {

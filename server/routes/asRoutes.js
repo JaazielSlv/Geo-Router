@@ -8,6 +8,9 @@ import {
   deleteAS
 } from '../controllers/asController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
+import { catchAsync } from '../middleware/asyncHandler.js';
+import { validateRequest } from '../middleware/validationMiddleware.js';
+import { createASValidator, idParamValidator, updateASValidator } from '../validators/asValidator.js';
 
 const router = express.Router();
 
@@ -22,7 +25,7 @@ const router = express.Router();
  *       200:
  *         description: Lista de AS
  */
-router.get('/', getAllAS);
+router.get('/', catchAsync(getAllAS));
 
 /**
  * @openapi
@@ -43,7 +46,7 @@ router.get('/', getAllAS);
  *       404:
  *         description: AS não encontrado
  */
-router.get('/:id', getASById);
+router.get('/:id', idParamValidator, validateRequest, catchAsync(getASById));
 
 /**
  * @openapi
@@ -71,7 +74,7 @@ router.get('/:id', getASById);
  *       401:
  *         description: Não autorizado
  */
-router.post('/', authMiddleware, createAS);
+router.post('/', authMiddleware, createASValidator, validateRequest, catchAsync(createAS));
 
 /**
  * @openapi
@@ -102,7 +105,7 @@ router.post('/', authMiddleware, createAS);
  *       404:
  *         description: AS não encontrado
  */
-router.put('/:id', authMiddleware, updateAS);
+router.put('/:id', authMiddleware, idParamValidator, updateASValidator, validateRequest, catchAsync(updateAS));
 
 /**
  * @openapi
@@ -133,7 +136,7 @@ router.put('/:id', authMiddleware, updateAS);
  *       404:
  *         description: AS não encontrado
  */
-router.patch('/:id', authMiddleware, patchAS);
+router.patch('/:id', authMiddleware, idParamValidator, updateASValidator, validateRequest, catchAsync(patchAS));
 
 /**
  * @openapi
@@ -158,6 +161,6 @@ router.patch('/:id', authMiddleware, patchAS);
  *       404:
  *         description: AS não encontrado
  */
-router.delete('/:id', authMiddleware, deleteAS);
+router.delete('/:id', authMiddleware, idParamValidator, validateRequest, catchAsync(deleteAS));
 
 export default router;
