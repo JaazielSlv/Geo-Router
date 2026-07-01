@@ -9,6 +9,11 @@
   <style>
     .status-badge { min-width: 80px; }
   </style>
+  <script>
+    if (!localStorage.getItem('georoute_admin_token')) {
+      window.location.href = 'login.html';
+    }
+  </script>
 </head>
 <body class="georouter-page">
   <header>
@@ -34,6 +39,7 @@
           <li class="nav-item mb-2"><a class="nav-link" href="as_detail.html">Detalhe AS</a></li>
           <li class="nav-item mb-2"><a class="nav-link" href="about.html">Sobre</a></li>
           <li class="nav-item mb-2"><a class="nav-link" href="contact.html">Contato</a></li>
+          <li class="nav-item mb-2"><a class="nav-link" href="login.html">Login</a></li>
           <li class="nav-item mb-2"><a class="nav-link active text-primary fw-bold" href="admin.html">Admin</a></li>
         </ul>
       </div>
@@ -49,34 +55,13 @@
       <button id="refreshBtn" class="btn btn-primary">Atualizar dados</button>
     </div>
 
-    <div class="row gy-4 mb-4">
-      <div class="col-12 col-lg-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">Login administrativo</h5>
-            <form id="loginForm">
-              <div class="mb-3">
-                <label for="loginEmail" class="form-label">Email</label>
-                <input id="loginEmail" type="email" class="form-control" placeholder="admin@georoute.com" required />
-              </div>
-              <div class="mb-3">
-                <label for="loginPassword" class="form-label">Senha</label>
-                <input id="loginPassword" type="password" class="form-control" placeholder="********" required />
-              </div>
-              <button id="loginBtn" class="btn btn-primary w-100" type="submit">Entrar</button>
-            </form>
-            <div id="loginStatus" class="mt-3"></div>
-          </div>
+    <div id="adminActions" class="card shadow-sm d-none">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="card-title">Acesso autorizado</h5>
+          <p class="text-muted mb-0">Você está conectado como administrador. Carregue e edite registros de AS.</p>
         </div>
-      </div>
-
-      <div class="col-12 col-lg-8">
-        <div id="adminActions" class="card shadow-sm d-none">
-          <div class="card-body">
-            <h5 class="card-title">Acesso autorizado</h5>
-            <p class="text-muted">Você está conectado como administrador. Carregue e edite registros de AS.</p>
-          </div>
-        </div>
+        <button id="logoutBtn" class="btn btn-outline-danger">Sair</button>
       </div>
     </div>
 

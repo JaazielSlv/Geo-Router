@@ -1,7 +1,5 @@
 import { geoRouteApi } from './api.js';
 
-const loginForm = document.getElementById('loginForm');
-const loginStatus = document.getElementById('loginStatus');
 const adminActions = document.getElementById('adminActions');
 const refreshBtn = document.getElementById('refreshBtn');
 const adminSearchInput = document.getElementById('adminSearchInput');
@@ -41,7 +39,6 @@ function setAuthenticated(token) {
   if (token) {
     localStorage.setItem('georoute_admin_token', token);
     adminActions.classList.remove('d-none');
-    showMessage('Autenticação bem-sucedida. Agora você pode criar, atualizar ou excluir AS.', 'success', loginStatus);
   } else {
     localStorage.removeItem('georoute_admin_token');
     adminActions.classList.add('d-none');
@@ -175,21 +172,6 @@ async function loadSummary() {
   }
 }
 
-async function handleLogin(event) {
-  event.preventDefault();
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-
-  try {
-    const response = await geoRouteApi.login(email, password);
-    setAuthenticated(response.token);
-    await loadSummary();
-    await refreshData();
-  } catch (error) {
-    showMessage('Falha no login. Verifique credenciais e tente novamente.', 'danger', loginStatus);
-  }
-}
-
 function restoreSession() {
   const token = getStoredToken();
   if (token) {
@@ -277,10 +259,21 @@ function handleSearch() {
   renderAdminResults(filtered);
 }
 
+function handleLogout() {
+  localStorage.removeItem('georoute_admin_token');
+  window.location.href = 'login.html';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('georoute_admin_token');
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }
+
   restoreSession();
-  loginForm.addEventListener('submit', handleLogin);
   refreshBtn.addEventListener('click', refreshData);
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
   adminSearchBtn.addEventListener('click', handleSearch);
   adminSearchInput.addEventListener('keydown', event => {
     if (event.key === 'Enter') {

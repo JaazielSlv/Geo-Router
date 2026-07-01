@@ -13,11 +13,12 @@ export class GeoRouteApi {
   }
 
   async request(path = '', options = {}) {
-    const headers = this.buildHeaders(options.headers);
+    const { headers: extraHeaders, ...rest } = options;
+    const headers = this.buildHeaders(extraHeaders);
 
     const response = await fetch(`${this.baseUrl}${path}`, {
       headers,
-      ...options
+      ...rest
     });
 
     if (!response.ok) {
