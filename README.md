@@ -118,7 +118,7 @@ npm start
 
 O seed inicial cria um usuário admin. Caso queira, altere o email e senha no `prisma/seed.js`.
 
-- Email: `admin@georoute.local`
+- Email: `admin@georoute.com`
 - Senha: `admin123`
 
 ## Rotas principais
@@ -137,3 +137,14 @@ O seed inicial cria um usuário admin. Caso queira, altere o email e senha no `p
 - A página `pages/admin.html` usa login JWT para permitir alterações de AS.
 - A rota `/api/dashboard/summary` alimenta as métricas na página `pages/dashboard.html`.
 - O Swagger documenta todos os endpoints disponíveis.
+
+## Validação e testes
+
+- Execute `npm test` para rodar os testes automatizados.
+- A aplicação também disponibiliza a rota `GET /api/health` para verificação rápida de saúde.
+
+## Artefatos de entrega
+
+- [PRD.md](specs/PRD.md): documento de requisitos do produto.
+- [AGENTS.md](AGENTS.md): convenções e orientações para desenvolvimento assistido por IA.
+- [specs](specs): pasta com artefatos de análise e projeto.

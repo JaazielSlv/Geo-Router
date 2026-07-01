@@ -9,7 +9,8 @@
     "dev": "nodemon server.js",
     "seed": "node prisma/seed.js",
     "prisma:migrate": "npx prisma db push",
-    "prisma:generate": "npx prisma generate"
+    "prisma:generate": "npx prisma generate",
+    "test": "node --test"
   },
   "dependencies": {
     "@prisma/client": "^5.12.0",

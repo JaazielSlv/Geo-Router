@@ -51,7 +51,15 @@ app.use(express.static(path.join(__dirname)));
 app.use('/Geo-Router', express.static(path.join(__dirname)));
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-app.listen(PORT, () => {
-  console.log(`GeoRoute API rodando em http://localhost:${PORT}`);
-  console.log(`Swagger disponível em http://localhost:${PORT}/api-docs`);
-});
+function startServer() {
+  app.listen(PORT, () => {
+    console.log(`GeoRoute API rodando em http://localhost:${PORT}`);
+    console.log(`Swagger disponível em http://localhost:${PORT}/api-docs`);
+  });
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  startServer();
+}
+
+export { app, startServer };
