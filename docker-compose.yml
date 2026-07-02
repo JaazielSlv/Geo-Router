@@ -28,8 +28,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
     command: sh -c "npx prisma db push && npm run seed && node server.js"
 
 volumes:
